@@ -1,4 +1,4 @@
-module api-gateway
+module github.com/gemdivk/api-gateway
 
 go 1.23.4
 
