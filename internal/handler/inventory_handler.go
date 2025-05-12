@@ -5,9 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gemdivk/api-gateway/internal/client"
-
 	inventorypb "github.com/gemdivk/api-gateway/proto/inventory"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +17,16 @@ func RegisterInventoryRoutes(r *gin.Engine, sc *client.ServiceClients) {
 			return
 		}
 		c.JSON(http.StatusOK, res.Products)
+	})
+
+	r.GET("/products/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		res, err := sc.Inventory.GetProductByID(context.Background(), &inventorypb.GetProductRequest{Id: id})
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+			return
+		}
+		c.JSON(http.StatusOK, res.Product)
 	})
 
 	r.POST("/products", func(c *gin.Context) {
