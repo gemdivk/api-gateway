@@ -1,15 +1,15 @@
 package main
 
 import (
-	"api-gateway/internal/client"
-	"api-gateway/internal/handler"
+	"github.com/gemdivk/api-gateway/internal/client"
+	"github.com/gemdivk/api-gateway/internal/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
-	clients := client.NewServiceClients()
+	clients := client.InitServiceClients()
 
 	handler.RegisterInventoryRoutes(r, clients)
 	handler.RegisterOrderRoutes(r, clients)

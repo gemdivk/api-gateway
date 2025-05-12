@@ -17,24 +17,17 @@ type ServiceClients struct {
 	Order     orderpb.OrderServiceClient
 }
 
-func NewServiceClients() *ServiceClients {
+func InitServiceClients() *ServiceClients {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	invConn, err := grpc.DialContext(ctx, "localhost:50051",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
-	)
+	invConn, err := grpc.DialContext(ctx, "localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Failed to connect to Inventory Service: %v", err)
+		log.Fatalf("Failed to connect to inventory-service: %v", err)
 	}
-
-	ordConn, err := grpc.DialContext(ctx, "localhost:50052",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
-	)
+	ordConn, err := grpc.DialContext(ctx, "localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Failed to connect to Order Service: %v", err)
+		log.Fatalf("Failed to connect to order-service: %v", err)
 	}
 
 	return &ServiceClients{
