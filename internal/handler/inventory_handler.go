@@ -45,14 +45,36 @@ func RegisterInventoryRoutes(r *gin.Engine, sc *client.ServiceClients) {
 
 	r.PATCH("/products/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		var p inventorypb.Product
-		if err := c.ShouldBindJSON(&p); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product"})
+
+		currentRes, err := sc.Inventory.GetProductByID(context.Background(), &inventorypb.GetProductRequest{Id: id})
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 			return
 		}
+		current := currentRes.Product
+
+		var updateData map[string]interface{}
+		if err := c.ShouldBindJSON(&updateData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+			return
+		}
+
+		if name, ok := updateData["name"].(string); ok {
+			current.Name = name
+		}
+		if cat, ok := updateData["category"].(string); ok {
+			current.Category = cat
+		}
+		if price, ok := updateData["price"].(float64); ok {
+			current.Price = price
+		}
+		if stock, ok := updateData["stock"].(float64); ok {
+			current.Stock = int32(stock)
+		}
+
 		res, err := sc.Inventory.UpdateProduct(context.Background(), &inventorypb.UpdateProductRequest{
 			Id:      id,
-			Product: &p,
+			Product: current,
 		})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
